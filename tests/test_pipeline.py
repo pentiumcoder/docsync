@@ -257,6 +257,44 @@ def test_run_check_marks_accurate_section(mocker):
     assert section.section_id in github.post_comment.call_args[0][1]
 
 
+def test_run_check_skips_verification_for_refactor_only_diff(mocker):
+    config = make_config()
+    chunk = make_chunk()
+    section = make_section()
+    graph = {chunk.chunk_id: [section.section_id]}
+
+    mocker.patch("docsync.pipeline.load_graph", return_value=graph)
+    behavior = mocker.patch(
+        "docsync.pipeline.diff_changes_behavior", return_value=False
+    )
+    verify = mocker.patch("docsync.pipeline.verify_staleness")
+    rewrite = mocker.patch("docsync.pipeline.rewrite_section")
+    github = make_github()
+    store = make_store([chunk], [section])
+    openai_client = MagicMock()
+
+    result = run_check(
+        "base",
+        "head",
+        7,
+        config=config,
+        openai_client=openai_client,
+        github_client=github,
+        store=store,
+    )
+
+    assert result.sections_checked == 1
+    assert result.accurate_count == 1
+    assert result.section_results[0].status == "accurate"
+    verify.assert_not_called()
+    rewrite.assert_not_called()
+    github.create_fix_pr.assert_not_called()
+    behavior.assert_called_once_with(
+        MODIFIED_DIFF, openai_client, config.docsync_model
+    )
+    github.post_comment.assert_called_once()
+
+
 def test_run_check_verifies_with_head_code(mocker, tmp_path):
     config = make_config()
     chunk = make_chunk()

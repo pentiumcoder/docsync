@@ -21,7 +21,7 @@ from docsync.index.embedder import embed_texts
 from docsync.index.graph import build_graph, load_graph, save_graph
 from docsync.index.store import ChromaStore
 from docsync.llm.rewriter import CorrectionResult, rewrite_section
-from docsync.llm.verifier import verify_staleness
+from docsync.llm.verifier import diff_changes_behavior, verify_staleness
 from docsync.parsers.code_parser import CodeChunk, parse_file as parse_code_file
 from docsync.parsers.code_parser import parse_directory as parse_code_directory
 from docsync.parsers.docs_parser import DocSection
@@ -231,7 +231,24 @@ def run_check(
     section_results: list[SectionResult] = []
     auto_fix_pairs: list[tuple[DocSection, CorrectionResult]] = []
 
+    behavior_changed = True
+    if sections:
+        behavior_changed = diff_changes_behavior(
+            diff_text, openai_client, config.docsync_model
+        )
+
     for section in sections:
+        if not behavior_changed:
+            section_results.append(
+                SectionResult(
+                    section_id=section.section_id,
+                    status="accurate",
+                    fix_pr_url=None,
+                    issues=[],
+                )
+            )
+            continue
+
         code_context = _build_code_context(
             section_chunks.get(section.section_id, []), deleted_paths
         )

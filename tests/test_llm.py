@@ -5,7 +5,11 @@ import pytest
 
 from docsync.llm import prompts
 from docsync.llm.rewriter import CorrectionResult, rewrite_section
-from docsync.llm.verifier import StalenessResult, verify_staleness
+from docsync.llm.verifier import (
+    StalenessResult,
+    diff_changes_behavior,
+    verify_staleness,
+)
 from docsync.parsers.docs_parser import DocSection
 
 MODEL = "gpt-4o-mini"
@@ -57,6 +61,8 @@ def json_response(payload):
     [
         "VERIFIER_SYSTEM_PROMPT",
         "VERIFIER_USER_PROMPT",
+        "BEHAVIOR_SYSTEM_PROMPT",
+        "BEHAVIOR_USER_PROMPT",
         "REWRITER_SYSTEM_PROMPT",
         "REWRITER_USER_PROMPT",
         "VALIDATOR_SYSTEM_PROMPT",
@@ -70,6 +76,7 @@ def test_prompt_constants_are_non_empty_strings(name):
 
 
 def test_user_prompt_templates_have_expected_placeholders():
+    assert "{diff}" in prompts.BEHAVIOR_USER_PROMPT
     assert "{section_content}" in prompts.VERIFIER_USER_PROMPT
     assert "{code_context}" in prompts.VERIFIER_USER_PROMPT
     assert "{diff}" in prompts.VERIFIER_USER_PROMPT
@@ -78,6 +85,53 @@ def test_user_prompt_templates_have_expected_placeholders():
     assert "{issues}" in prompts.REWRITER_USER_PROMPT
     assert "{corrected_content}" in prompts.VALIDATOR_USER_PROMPT
     assert "{issues}" in prompts.VALIDATOR_USER_PROMPT
+
+
+# --- behavior classifier ---
+
+SIMPLE_DIFF = (
+    "diff --git a/x.py b/x.py\n"
+    "--- a/x.py\n"
+    "+++ b/x.py\n"
+    "@@ -1 +1 @@\n"
+    "-    parts.append(value)\n"
+    "+    pieces.append(value)\n"
+)
+
+
+def test_diff_changes_behavior_true():
+    client = make_client(
+        json_response({"behavior_changed": True, "reason": "Default value changed."})
+    )
+
+    assert diff_changes_behavior(SIMPLE_DIFF, client, MODEL) is True
+
+
+def test_diff_changes_behavior_false():
+    client = make_client(
+        json_response({"behavior_changed": False, "reason": "Variable rename only."})
+    )
+
+    assert diff_changes_behavior(SIMPLE_DIFF, client, MODEL) is False
+
+
+def test_diff_changes_behavior_empty_diff_skips_model():
+    client = MagicMock()
+
+    assert diff_changes_behavior("", client, MODEL) is False
+    client.chat.completions.create.assert_not_called()
+
+
+def test_diff_changes_behavior_defaults_true_on_error():
+    client = make_client(make_chat_response("not json"))
+
+    assert diff_changes_behavior(SIMPLE_DIFF, client, MODEL) is True
+
+
+def test_diff_changes_behavior_defaults_true_on_non_boolean():
+    client = make_client(json_response({"behavior_changed": "yes"}))
+
+    assert diff_changes_behavior(SIMPLE_DIFF, client, MODEL) is True
 
 
 # --- verifier ---

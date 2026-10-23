@@ -48,6 +48,32 @@ def _safe_default(section: DocSection, reason: str) -> StalenessResult:
     )
 
 
+def diff_changes_behavior(diff: str, client: "OpenAI", model: str) -> bool:
+    compact = _compact_diff(diff)
+    if not compact.strip():
+        return False
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": prompts.BEHAVIOR_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": prompts.BEHAVIOR_USER_PROMPT.format(diff=compact),
+                },
+            ],
+            response_format={"type": "json_object"},
+            temperature=0,
+        )
+        payload = json.loads(response.choices[0].message.content)
+        value = payload["behavior_changed"]
+        if not isinstance(value, bool):
+            return True
+        return value
+    except Exception:
+        return True
+
+
 def verify_staleness(
     section: DocSection,
     code_context: str,

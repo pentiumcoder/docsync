@@ -34,6 +34,24 @@ VERIFIER_USER_PROMPT = (
     "array. If it is stale, quote the statement and the changed line that contradicts it."
 )
 
+BEHAVIOR_SYSTEM_PROMPT = (
+    "You classify pull request diffs. Decide whether the diff changes observable "
+    "behavior.\n\n"
+    "Behavior-preserving: renaming local variables, adding type annotations, "
+    "reformatting, adding or removing whitespace, adding comments or docstrings, and "
+    "adding internal helpers without changing observable behavior.\n"
+    "Behavior-changing: changes to inputs, outputs, defaults, errors, side effects, "
+    "required configuration, public API names, file paths, filtering rules, validation, "
+    "or control flow.\n\n"
+    "Respond ONLY with a JSON object matching this schema: "
+    '{"behavior_changed": boolean, "reason": string}.'
+)
+
+BEHAVIOR_USER_PROMPT = (
+    "Diff (only changed lines and hunk headers):\n---\n{diff}\n---\n\n"
+    "Does this diff change observable behavior? If unsure, answer true."
+)
+
 REWRITER_SYSTEM_PROMPT = (
     "You are a precise technical writer. You correct stale markdown documentation so it "
     "matches the current code. Change only what is necessary and preserve all accurate "
