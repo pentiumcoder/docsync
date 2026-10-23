@@ -28,7 +28,8 @@ Paths recorded in the index are relative to the repository root, so keep the cod
 repository root when you expect documentation to reference files consistently.
 
 Re-index after adding, renaming, or moving documented code, and after restructuring documentation.
-Code changes are detected through the graph, not by re-parsing the repository during a check.
+A check loads the committed graph to find affected sections, then re-parses the changed files at the
+pull request head so that verification sees the new code. The check never re-embeds the repository.
 
 ## Committing the index
 
