@@ -55,14 +55,15 @@
     "docs/usage.md##Using DocSync>How automation decides"
   ],
   "docsync/llm/rewriter.py::rewrite_section": [
-    "docs/usage.md##Using DocSync>Adding the check to a pull request",
     "docs/usage.md##Using DocSync>How automation decides"
   ],
   "docsync/llm/verifier.py::StalenessResult": [
     "docs/usage.md##Using DocSync>How automation decides"
   ],
+  "docsync/llm/verifier.py::diff_changes_behavior": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
   "docsync/llm/verifier.py::verify_staleness": [
-    "docs/usage.md##Using DocSync>Adding the check to a pull request",
     "docs/usage.md##Using DocSync>How automation decides"
   ],
   "docsync/parsers/code_parser.py::CodeChunk": [

@@ -13,8 +13,9 @@ reports results and always exits successfully.
 2. On a pull request, `docsync check` parses the diff, ignores non-Python files, test files, and
    comment/whitespace-only hunks, and maps the remaining changes to documentation sections through
    the committed link graph.
-3. Each affected section is verified with an LLM. Confirmed-stale sections are rewritten, validated,
-   and applied when confidence clears the threshold; otherwise they are flagged in the PR comment.
+3. A quick LLM pass skips verification when the changes only preserve behavior. Otherwise each
+   affected section is verified, rewritten, and validated; fixes are applied when confidence clears
+   the threshold, and everything else is flagged in the PR comment.
 
 The index lives in `.docsync/` and is committed to your repository, so CI does not re-embed anything.
 
@@ -158,7 +159,7 @@ under `tests/integration/` are excluded and require real keys.
 - The index is a snapshot. Re-index after large refactors, file moves, or documentation rewrites.
 - Pull requests from forks receive a read-only `GITHUB_TOKEN`, so they cannot receive comments or
   fix pull requests. Reports still appear in the workflow log and the job exits successfully.
-- LLM verification and rewriting incur OpenAI usage on every affected section.
+- LLM classification, verification, and rewriting incur OpenAI usage on each check.
 
 ## License
 

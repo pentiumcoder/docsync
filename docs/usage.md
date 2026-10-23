@@ -65,8 +65,8 @@ Check out the repository with `fetch-depth: 0`. Grant `contents: write` and
 `pull-requests: write` when you want fix branches and comments; `run_check` uses `GitHubClient` to
 call `get_diff`, `post_comment`, and `create_fix_pr`.
 
-For a local dry run, call `run_check` through the command line with `--dry-run`. The dry run still
-uses `verify_staleness` and `rewrite_section`, but it does not post anything.
+For a local dry run, call `run_check` through the command line with `--dry-run`. The dry run runs
+the same classifier, verification, and rewriting steps, but it does not post anything.
 
 ## Configuration
 
@@ -79,7 +79,7 @@ module reads environment variables directly.
 | `OPENAI_BASE_URL` | none | Base URL for OpenAI-compatible APIs (e.g. `http://localhost:11434/v1` for Ollama) |
 | `GITHUB_TOKEN` | none | Commenting and pull request creation |
 | `GITHUB_REPO` | none | Repository slug in `owner/name` form |
-| `DOCSYNC_MODEL` | `gpt-4o-mini` | Chat model for verification and rewriting |
+| `DOCSYNC_MODEL` | `gpt-4o-mini` | Chat model for classification, verification, and rewriting |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model for indexing and similarity |
 | `CONFIDENCE_THRESHOLD` | `0.8` | Cutoff for automatic fixes |
 | `CHROMA_PATH` | `.docsync/chroma` | ChromaDB persistence directory |
@@ -94,12 +94,16 @@ Missing required values raise `ValueError` with the variable name, for example
 non-Python files, test files, and hunks whose added and removed lines are only comments or
 whitespace. `run_check` then maps the surviving changes to sections through the graph.
 
-For every affected `DocSection`, `verify_staleness` returns a `StalenessResult`. Accurate sections
-are reported as-is. Stale sections go to `rewrite_section`, which returns a `CorrectionResult` and
-runs an internal validation pass. The section is auto-fixed only when both the rewrite and the
-validation clear `CONFIDENCE_THRESHOLD`; otherwise it is flagged for a human. Each file is updated
-once, using the current on-disk content, so several sections in one document produce a single
-`FileEdit`.
+Before verification, `diff_changes_behavior` classifies the filtered changes. When every change is
+behavior-preserving (renames, type annotations, formatting, or comments), affected sections are
+reported accurate without calling the verifier.
+
+Otherwise, for every affected `DocSection`, `verify_staleness` returns a `StalenessResult`. Accurate
+sections are reported as-is. Stale sections go to `rewrite_section`, which returns a
+`CorrectionResult` and runs an internal validation pass. The section is auto-fixed only when both
+the rewrite and the validation clear `CONFIDENCE_THRESHOLD`; otherwise it is flagged for a human.
+Each file is updated once, using the current on-disk content, so several sections in one document
+produce a single `FileEdit`.
 
 ## Writing documentation DocSync can link
 
