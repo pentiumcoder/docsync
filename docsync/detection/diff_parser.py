@@ -15,6 +15,7 @@ class DiffHunk:
     new_end: int
     added_lines: list[str]
     removed_lines: list[str]
+    section_header: str = ""
 
 
 @dataclass
@@ -66,6 +67,7 @@ def _build_hunk(hunk) -> DiffHunk:
         new_end=new_end,
         added_lines=added_lines,
         removed_lines=removed_lines,
+        section_header=hunk.section_header or "",
     )
 
 

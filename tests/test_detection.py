@@ -230,6 +230,19 @@ def test_pure_deletion_zero_length_new_side():
     assert hunk.removed_lines == ["removed one", "removed two"]
 
 
+def test_parse_diff_captures_hunk_section_header():
+    diff = (
+        "diff --git a/x.py b/x.py\n"
+        "--- a/x.py\n"
+        "+++ b/x.py\n"
+        "@@ -1 +1 @@ def load_config():\n"
+        "-    value = 1\n"
+        "+    value = 2\n"
+    )
+    hunk = parse_diff(diff)[0].hunks[0]
+    assert hunk.section_header == "def load_config():"
+
+
 def test_binary_file_has_no_hunks():
     change = parse_diff(BINARY_DIFF)[0]
     assert change.file_path == "img.png"

@@ -76,8 +76,10 @@ def _format_changes_for_behavior(changes: list[FileChange]) -> str:
         for hunk in change.hunks:
             old_count = hunk.old_end - hunk.old_start + 1
             new_count = hunk.new_end - hunk.new_start + 1
+            header = f" {hunk.section_header}" if hunk.section_header else ""
             lines.append(
-                f"@@ -{hunk.old_start},{old_count} +{hunk.new_start},{new_count} @@"
+                f"@@ -{hunk.old_start},{old_count} "
+                f"+{hunk.new_start},{new_count} @@{header}"
             )
             lines.extend(f"-{line}" for line in hunk.removed_lines)
             lines.extend(f"+{line}" for line in hunk.added_lines)
