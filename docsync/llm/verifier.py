@@ -26,6 +26,18 @@ def _clamp_confidence(value) -> float:
     return max(0.0, min(1.0, confidence))
 
 
+def _compact_diff(diff: str) -> str:
+    """Keep only changed lines and file/hunk headers, dropping context."""
+    kept: list[str] = []
+    for line in diff.splitlines():
+        if not line or line.startswith("\\") or line.startswith("index "):
+            continue
+        if line.startswith(" "):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
 def _safe_default(section: DocSection, reason: str) -> StalenessResult:
     return StalenessResult(
         is_stale=True,
@@ -46,7 +58,7 @@ def verify_staleness(
     user_prompt = prompts.VERIFIER_USER_PROMPT.format(
         section_content=section.content,
         code_context=code_context,
-        diff=diff,
+        diff=_compact_diff(diff),
     )
     messages = [
         {"role": "system", "content": prompts.VERIFIER_SYSTEM_PROMPT},

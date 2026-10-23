@@ -136,7 +136,14 @@ def test_verify_staleness_sends_expected_request():
         )
     )
     section = make_section(content="UNIQUE_SECTION_BODY")
-    verify_staleness(section, "UNIQUE_CODE_BODY", client, MODEL, "UNIQUE_DIFF_BODY")
+    diff = (
+        "diff --git a/app.py b/app.py\n"
+        "@@ -1 +1 @@\n"
+        " UNCHANGED_CONTEXT_LINE\n"
+        "-old_line\n"
+        "+UNIQUE_DIFF_BODY\n"
+    )
+    verify_staleness(section, "UNIQUE_CODE_BODY", client, MODEL, diff)
 
     kwargs = client.chat.completions.create.call_args[1]
     assert kwargs["model"] == MODEL
@@ -148,6 +155,7 @@ def test_verify_staleness_sends_expected_request():
     assert "UNIQUE_SECTION_BODY" in kwargs["messages"][1]["content"]
     assert "UNIQUE_CODE_BODY" in kwargs["messages"][1]["content"]
     assert "UNIQUE_DIFF_BODY" in kwargs["messages"][1]["content"]
+    assert "UNCHANGED_CONTEXT_LINE" not in kwargs["messages"][1]["content"]
 
 
 def test_verify_staleness_clamps_confidence():
