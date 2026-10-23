@@ -69,6 +69,21 @@ def _build_code_context(
     return "\n\n".join(blocks)
 
 
+def _format_changes_for_behavior(changes: list[FileChange]) -> str:
+    lines: list[str] = []
+    for change in changes:
+        lines.append(f"--- {change.file_path}")
+        for hunk in change.hunks:
+            old_count = hunk.old_end - hunk.old_start + 1
+            new_count = hunk.new_end - hunk.new_start + 1
+            lines.append(
+                f"@@ -{hunk.old_start},{old_count} +{hunk.new_start},{new_count} @@"
+            )
+            lines.extend(f"-{line}" for line in hunk.removed_lines)
+            lines.extend(f"+{line}" for line in hunk.added_lines)
+    return "\n".join(lines)
+
+
 def _load_head_chunks(
     changes: list[FileChange], matched_ids: set[str], repo_path: str
 ) -> dict[str, CodeChunk]:
@@ -234,7 +249,9 @@ def run_check(
     behavior_changed = True
     if sections:
         behavior_changed = diff_changes_behavior(
-            diff_text, openai_client, config.docsync_model
+            _format_changes_for_behavior(changes),
+            openai_client,
+            config.docsync_model,
         )
 
     for section in sections:

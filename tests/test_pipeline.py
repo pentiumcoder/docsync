@@ -289,9 +289,13 @@ def test_run_check_skips_verification_for_refactor_only_diff(mocker):
     verify.assert_not_called()
     rewrite.assert_not_called()
     github.create_fix_pr.assert_not_called()
-    behavior.assert_called_once_with(
-        MODIFIED_DIFF, openai_client, config.docsync_model
-    )
+    behavior.assert_called_once()
+    behavior_diff = behavior.call_args[0][0]
+    assert "src/api.py" in behavior_diff
+    assert "+    return User(user_id)" in behavior_diff
+    assert "def get_user(user_id):" not in behavior_diff
+    assert behavior.call_args[0][1] is openai_client
+    assert behavior.call_args[0][2] == config.docsync_model
     github.post_comment.assert_called_once()
 
 
