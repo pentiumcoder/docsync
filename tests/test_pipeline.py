@@ -26,9 +26,11 @@ SECTION_ID = "docs/api.md##API Reference>get_user"
 def make_config(**overrides):
     values = {
         "openai_api_key": "test-key",
+        "openai_base_url": None,
         "github_token": "test-token",
         "github_repo": "owner/repo",
         "docsync_model": "gpt-4o-mini",
+        "embedding_model": "text-embedding-3-small",
         "confidence_threshold": 0.8,
         "chroma_path": ".docsync/chroma",
         "graph_path": ".docsync/graph.json",

@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 @dataclass
 class Config:
     openai_api_key: str
+    openai_base_url: str | None
     github_token: str | None
     github_repo: str | None
     docsync_model: str
+    embedding_model: str
     confidence_threshold: float
     chroma_path: str
     graph_path: str
@@ -19,11 +21,14 @@ def load_config() -> Config:
     openai_api_key = os.getenv("OPENAI_API_KEY")
     if not openai_api_key:
         raise ValueError("Missing required env var: OPENAI_API_KEY")
-        
+
+    openai_base_url = os.getenv("OPENAI_BASE_URL") or None
+
     github_token = os.getenv("GITHUB_TOKEN")
     github_repo = os.getenv("GITHUB_REPO")
-    
+
     docsync_model = os.getenv("DOCSYNC_MODEL", "gpt-4o-mini")
+    embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
     
     confidence_threshold_str = os.getenv("CONFIDENCE_THRESHOLD", "0.8")
     try:
@@ -38,9 +43,11 @@ def load_config() -> Config:
     
     return Config(
         openai_api_key=openai_api_key,
+        openai_base_url=openai_base_url,
         github_token=github_token,
         github_repo=github_repo,
         docsync_model=docsync_model,
+        embedding_model=embedding_model,
         confidence_threshold=confidence_threshold,
         chroma_path=chroma_path,
         graph_path=graph_path,

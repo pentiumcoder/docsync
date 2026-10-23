@@ -81,6 +81,30 @@ def test_embed_texts_batches_correctly():
     assert len(second_call_input) == 50
 
 
+# --- Test 1b: Model override ---
+
+def test_embed_texts_uses_custom_model():
+    """The embedding model is passed through to the API call."""
+    mock_client = MagicMock()
+    mock_client.embeddings.create.return_value = make_mock_response([make_embedding(10)])
+
+    embed_texts(["test"], mock_client, "nomic-embed-text")
+
+    assert mock_client.embeddings.create.call_args[1]["model"] == "nomic-embed-text"
+
+
+def test_embed_chunk_and_section_use_custom_model():
+    """Chunk and section helpers forward the embedding model."""
+    mock_client = MagicMock()
+    mock_client.embeddings.create.return_value = make_mock_response([make_embedding(10)])
+
+    embed_chunk("sig", "doc", "body", mock_client, "nomic-embed-text")
+    embed_section("content", mock_client, "nomic-embed-text")
+
+    assert mock_client.embeddings.create.call_args_list[0][1]["model"] == "nomic-embed-text"
+    assert mock_client.embeddings.create.call_args_list[1][1]["model"] == "nomic-embed-text"
+
+
 # --- Test 2: Retry on RateLimitError ---
 
 @patch("docsync.index.embedder.time.sleep")

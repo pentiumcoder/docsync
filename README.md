@@ -27,7 +27,18 @@ Install DocSync from source, then point it at your code and docs directories:
 ```bash
 pip install "git+https://github.com/pentiumcoder/docsync.git"
 
+# Use OpenAI or any OpenAI-compatible API (e.g. Ollama)
 export OPENAI_API_KEY=sk-...
+docsync index . docs
+```
+
+For local inference with Ollama, set `OPENAI_BASE_URL` and the models:
+
+```bash
+export OPENAI_API_KEY=ollama
+export OPENAI_BASE_URL=http://localhost:11434/v1
+export DOCSYNC_MODEL=llama3.1:8b
+export EMBEDDING_MODEL=nomic-embed-text
 docsync index . docs
 ```
 

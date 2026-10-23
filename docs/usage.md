@@ -6,8 +6,8 @@ DocSync for your team.
 ## Requirements
 
 DocSync runs on Python 3.10 or newer. The action itself is packaged as a Docker action, so CI needs
-no separate Python setup. Local indexing requires an OpenAI API key with access to the embedding and
-chat models you configure.
+no separate Python setup. Local indexing requires an API key and models for embeddings and chat. You
+can use OpenAI or any OpenAI-compatible provider, including a local Ollama instance.
 
 The persistent index is stored in `.docsync/` and must be committed. It contains the ChromaDB files
 under `.docsync/chroma` and the link graph at `.docsync/graph.json`.
@@ -75,9 +75,11 @@ module reads environment variables directly.
 | Variable | Default | Purpose |
 |---|---|---|
 | `OPENAI_API_KEY` | none | Authentication for embeddings and chat completions |
+| `OPENAI_BASE_URL` | none | Base URL for OpenAI-compatible APIs (e.g. `http://localhost:11434/v1` for Ollama) |
 | `GITHUB_TOKEN` | none | Commenting and pull request creation |
 | `GITHUB_REPO` | none | Repository slug in `owner/name` form |
 | `DOCSYNC_MODEL` | `gpt-4o-mini` | Chat model for verification and rewriting |
+| `EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model for indexing and similarity |
 | `CONFIDENCE_THRESHOLD` | `0.8` | Cutoff for automatic fixes |
 | `CHROMA_PATH` | `.docsync/chroma` | ChromaDB persistence directory |
 | `GRAPH_PATH` | `.docsync/graph.json` | Link graph location |

@@ -108,15 +108,25 @@ def run_index(
 ) -> IndexResult:
     config = config or load_config()
     if openai_client is None:
-        openai_client = OpenAI(api_key=config.openai_api_key)
+        openai_client = OpenAI(
+            api_key=config.openai_api_key, base_url=config.openai_base_url
+        )
     if store is None:
         store = ChromaStore(config.chroma_path)
 
     chunks = parse_code_directory(repo_path, repo_path)
     sections = parse_docs_directory(docs_path, repo_path)
 
-    chunk_embeddings = embed_texts([_chunk_text(chunk) for chunk in chunks], openai_client)
-    section_embeddings = embed_texts([section.content for section in sections], openai_client)
+    chunk_embeddings = embed_texts(
+        [_chunk_text(chunk) for chunk in chunks],
+        openai_client,
+        config.embedding_model,
+    )
+    section_embeddings = embed_texts(
+        [section.content for section in sections],
+        openai_client,
+        config.embedding_model,
+    )
 
     store.upsert_chunks(chunks, chunk_embeddings)
     store.upsert_sections(sections, section_embeddings)
@@ -161,7 +171,9 @@ def run_check(
         )
 
     if openai_client is None:
-        openai_client = OpenAI(api_key=config.openai_api_key)
+        openai_client = OpenAI(
+            api_key=config.openai_api_key, base_url=config.openai_base_url
+        )
     if store is None:
         store = ChromaStore(config.chroma_path)
 

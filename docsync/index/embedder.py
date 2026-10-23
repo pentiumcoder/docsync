@@ -4,7 +4,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from openai import OpenAI
 
-def embed_texts(texts: list[str], client: "OpenAI") -> list[list[float]]:
+def embed_texts(
+    texts: list[str],
+    client: "OpenAI",
+    model: str = "text-embedding-3-small",
+) -> list[list[float]]:
     """Embeds a list of texts in batches of 100."""
     from openai import RateLimitError
     
@@ -24,7 +28,7 @@ def embed_texts(texts: list[str], client: "OpenAI") -> list[list[float]]:
             try:
                 response = client.embeddings.create(
                     input=batch,
-                    model="text-embedding-3-small"
+                    model=model
                 )
                 batch_embeddings = [data.embedding for data in response.data]
                 all_embeddings.extend(batch_embeddings)
@@ -38,11 +42,21 @@ def embed_texts(texts: list[str], client: "OpenAI") -> list[list[float]]:
                     
     return all_embeddings
 
-def embed_chunk(signature: str, docstring: str | None, body: str, client: "OpenAI") -> list[float]:
+def embed_chunk(
+    signature: str,
+    docstring: str | None,
+    body: str,
+    client: "OpenAI",
+    model: str = "text-embedding-3-small",
+) -> list[float]:
     """Embeds a CodeChunk using primitive strings."""
     text = f"{signature}\n{docstring or ''}\n{body[:500]}"
-    return embed_texts([text], client)[0]
+    return embed_texts([text], client, model)[0]
 
-def embed_section(content: str, client: "OpenAI") -> list[float]:
+def embed_section(
+    content: str,
+    client: "OpenAI",
+    model: str = "text-embedding-3-small",
+) -> list[float]:
     """Embeds a DocSection using primitive strings."""
-    return embed_texts([content], client)[0]
+    return embed_texts([content], client, model)[0]
