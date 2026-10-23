@@ -9,7 +9,7 @@ from docsync.detection.change_filter import (
     map_change_to_chunks,
     map_chunks_to_sections,
 )
-from docsync.detection.diff_parser import parse_diff
+from docsync.detection.diff_parser import FileChange, parse_diff
 from docsync.github_client.client import FileEdit, GitHubClient
 from docsync.github_client.formatter import (
     SectionResult,
@@ -22,7 +22,7 @@ from docsync.index.graph import build_graph, load_graph, save_graph
 from docsync.index.store import ChromaStore
 from docsync.llm.rewriter import CorrectionResult, rewrite_section
 from docsync.llm.verifier import verify_staleness
-from docsync.parsers.code_parser import CodeChunk
+from docsync.parsers.code_parser import CodeChunk, parse_file as parse_code_file
 from docsync.parsers.code_parser import parse_directory as parse_code_directory
 from docsync.parsers.docs_parser import DocSection
 from docsync.parsers.docs_parser import parse_directory as parse_docs_directory
@@ -56,12 +56,35 @@ def _make_github_client(config: Config) -> GitHubClient:
     return GitHubClient(config.github_token, config.github_repo)
 
 
-def _build_code_context(chunks: list[CodeChunk]) -> str:
-    blocks = [
-        f"# {chunk.file_path}::{chunk.name}\n{chunk.body}"
-        for chunk in sorted(chunks, key=lambda chunk: chunk.chunk_id)
-    ]
+def _build_code_context(
+    chunks: list[CodeChunk], deleted_paths: set[str] | None = None
+) -> str:
+    deleted_paths = deleted_paths or set()
+    blocks = []
+    for chunk in sorted(chunks, key=lambda chunk: chunk.chunk_id):
+        block = f"# {chunk.file_path}::{chunk.name}\n{chunk.body}"
+        if chunk.file_path in deleted_paths:
+            block += "\n# NOTE: this file was deleted in the pull request."
+        blocks.append(block)
     return "\n\n".join(blocks)
+
+
+def _load_head_chunks(
+    changes: list[FileChange], matched_ids: set[str], repo_path: str
+) -> dict[str, CodeChunk]:
+    head_chunks: dict[str, CodeChunk] = {}
+    for change in changes:
+        if change.change_type == "deleted":
+            continue
+        path = os.path.join(repo_path, change.file_path)
+        try:
+            file_chunks = parse_code_file(path, repo_path)
+        except (OSError, ValueError):
+            continue
+        for chunk in file_chunks:
+            if chunk.chunk_id in matched_ids:
+                head_chunks[chunk.chunk_id] = chunk
+    return head_chunks
 
 
 def _build_file_edits(
@@ -188,6 +211,15 @@ def run_check(
         for chunk in chunk_list:
             matched_chunks[chunk.chunk_id] = chunk
 
+    head_chunks = _load_head_chunks(changes, set(matched_chunks), repo_path)
+    matched_chunks = {
+        chunk_id: head_chunks.get(chunk_id, chunk)
+        for chunk_id, chunk in matched_chunks.items()
+    }
+    deleted_paths = {
+        change.file_path for change in changes if change.change_type == "deleted"
+    }
+
     section_ids = map_chunks_to_sections(list(matched_chunks.keys()), graph)
     sections = store.get_sections_by_ids(section_ids)
 
@@ -200,7 +232,9 @@ def run_check(
     auto_fix_pairs: list[tuple[DocSection, CorrectionResult]] = []
 
     for section in sections:
-        code_context = _build_code_context(section_chunks.get(section.section_id, []))
+        code_context = _build_code_context(
+            section_chunks.get(section.section_id, []), deleted_paths
+        )
         staleness = verify_staleness(
             section, code_context, openai_client, config.docsync_model
         )

@@ -20,6 +20,14 @@ MODIFIED_DIFF = """diff --git a/src/api.py b/src/api.py
 +    # changed
 """
 
+DELETED_DIFF = """diff --git a/src/api.py b/src/api.py
+deleted file mode 100644
+--- a/src/api.py
++++ /dev/null
+@@ -1,1 +0,0 @@
+-def get_user(user_id):
+"""
+
 SECTION_ID = "docs/api.md##API Reference>get_user"
 
 
@@ -246,6 +254,72 @@ def test_run_check_marks_accurate_section(mocker):
 
     github.post_comment.assert_called_once()
     assert section.section_id in github.post_comment.call_args[0][1]
+
+
+def test_run_check_verifies_with_head_code(mocker, tmp_path):
+    config = make_config()
+    chunk = make_chunk()
+    section = make_section()
+    graph = {chunk.chunk_id: [section.section_id]}
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    (src_dir / "api.py").write_text(
+        "def get_user(user_id):\n    return User(user_id)\n", encoding="utf-8"
+    )
+
+    mocker.patch("docsync.pipeline.load_graph", return_value=graph)
+    verify = mocker.patch(
+        "docsync.pipeline.verify_staleness", return_value=staleness(False)
+    )
+    github = make_github()
+    store = make_store([chunk], [section])
+
+    run_check(
+        "base",
+        "head",
+        7,
+        config=config,
+        openai_client=MagicMock(),
+        github_client=github,
+        store=store,
+        repo_path=str(tmp_path),
+    )
+
+    context = verify.call_args[0][1]
+    assert "return User(user_id)" in context
+    assert "return db.get(user_id)" not in context
+
+
+def test_run_check_notes_deleted_files(mocker):
+    config = make_config()
+    chunk = make_chunk()
+    section = make_section()
+    graph = {chunk.chunk_id: [section.section_id]}
+
+    mocker.patch("docsync.pipeline.load_graph", return_value=graph)
+    verify = mocker.patch(
+        "docsync.pipeline.verify_staleness", return_value=staleness(True, ["Missing"])
+    )
+    mocker.patch(
+        "docsync.pipeline.rewrite_section",
+        return_value=correction(requires_human_review=True),
+    )
+    github = make_github(diff_text=DELETED_DIFF)
+    store = make_store([chunk], [section])
+
+    run_check(
+        "base",
+        "head",
+        7,
+        config=config,
+        openai_client=MagicMock(),
+        github_client=github,
+        store=store,
+    )
+
+    context = verify.call_args[0][1]
+    assert "deleted in the pull request" in context
 
 
 # --- run_check: flagged ---
