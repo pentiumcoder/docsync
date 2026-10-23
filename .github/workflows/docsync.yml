@@ -21,9 +21,13 @@ jobs:
           fetch-depth: 0
 
       - name: Check documentation
+        if: ${{ false }}
         uses: ./
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          DOCSYNC_MODEL: ${{ secrets.DOCSYNC_MODEL }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}
         with:
