@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docsync"
+version = "0.1.0"
+description = "A GitHub Action that detects when Python code changes make documentation inaccurate."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openai",
+    "chromadb",
+    "PyGithub",
+    "python-dotenv",
+    "click",
+    "unidiff"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-mock"
+]
+
+[project.scripts]
+docsync = "docsync.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["docsync*"]

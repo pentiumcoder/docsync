@@ -1,0 +1,26 @@
+name: DocSync
+
+description: Detect stale documentation caused by Python code changes in a pull request.
+
+inputs:
+  base_ref:
+    description: Base commit SHA of the pull request.
+    required: true
+  head_ref:
+    description: Head commit SHA of the pull request.
+    required: true
+  pr_number:
+    description: Pull request number.
+    required: true
+
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - check
+    - --base-ref
+    - ${{ inputs.base_ref }}
+    - --head-ref
+    - ${{ inputs.head_ref }}
+    - --pr-number
+    - ${{ inputs.pr_number }}

@@ -1,0 +1,10 @@
+.git
+.github
+.venv
+.pytest_cache
+docsync.egg-info
+tests
+.env
+.secrets
+.docsync
+*.pdf

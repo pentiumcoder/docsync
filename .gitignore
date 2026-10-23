@@ -1,0 +1,53 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Secrets
+.secrets
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Never commit agent/context source docs
+CONTEXT.md
+context.md
+conext.md
+AGENTS.md
+agents.md
+context.pdf
+agents.pdf
+context1.pdf
+agents1.pdf
+
+# Note: .docsync/ is NOT ignored as per project rules (committed persistent index)
