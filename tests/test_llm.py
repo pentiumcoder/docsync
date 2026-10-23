@@ -72,6 +72,7 @@ def test_prompt_constants_are_non_empty_strings(name):
 def test_user_prompt_templates_have_expected_placeholders():
     assert "{section_content}" in prompts.VERIFIER_USER_PROMPT
     assert "{code_context}" in prompts.VERIFIER_USER_PROMPT
+    assert "{diff}" in prompts.VERIFIER_USER_PROMPT
     assert "{section_content}" in prompts.REWRITER_USER_PROMPT
     assert "{code_context}" in prompts.REWRITER_USER_PROMPT
     assert "{issues}" in prompts.REWRITER_USER_PROMPT
@@ -135,7 +136,7 @@ def test_verify_staleness_sends_expected_request():
         )
     )
     section = make_section(content="UNIQUE_SECTION_BODY")
-    verify_staleness(section, "UNIQUE_CODE_BODY", client, MODEL)
+    verify_staleness(section, "UNIQUE_CODE_BODY", client, MODEL, "UNIQUE_DIFF_BODY")
 
     kwargs = client.chat.completions.create.call_args[1]
     assert kwargs["model"] == MODEL
@@ -146,6 +147,7 @@ def test_verify_staleness_sends_expected_request():
     assert kwargs["messages"][1]["role"] == "user"
     assert "UNIQUE_SECTION_BODY" in kwargs["messages"][1]["content"]
     assert "UNIQUE_CODE_BODY" in kwargs["messages"][1]["content"]
+    assert "UNIQUE_DIFF_BODY" in kwargs["messages"][1]["content"]
 
 
 def test_verify_staleness_clamps_confidence():

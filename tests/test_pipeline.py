@@ -251,6 +251,7 @@ def test_run_check_marks_accurate_section(mocker):
     assert "def get_user" in verify_args[1]
     assert verify_args[2] is openai_client
     assert verify_args[3] == config.docsync_model
+    assert verify_args[4] == MODIFIED_DIFF
 
     github.post_comment.assert_called_once()
     assert section.section_id in github.post_comment.call_args[0][1]

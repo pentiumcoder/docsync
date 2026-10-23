@@ -6,11 +6,11 @@ VERIFIER_SYSTEM_PROMPT = (
     "- Omissions are not staleness. Documentation may summarize behavior and does not "
     "need to mention parameters, return types, private helpers, internal strategies, "
     "retries, or other implementation details it never claims to cover.\n"
-    "- Set is_stale to true only when an existing statement in the documentation is now "
-    "false, misleading, or obsolete because of the code shown. Quote the documentation "
-    "claim and the contradicting code in specific_issues.\n"
-    "- The code excerpt may be partial and may contain only the functions relevant to "
-    "this change. Do not flag behavior that lies outside the excerpt.\n"
+    "- Set is_stale to true only when the changed code in the diff makes an existing "
+    "statement in the documentation false, misleading, or obsolete. Quote the "
+    "documentation claim and the contradicting code in specific_issues.\n"
+    "- The code excerpt and diff may be partial. Do not flag behavior that lies outside "
+    "the excerpt, and do not flag pre-existing gaps that the diff does not touch.\n"
     "- Prefer is_stale=false when the documentation remains true, even if it is "
     "incomplete.\n"
     "- When is_stale is false, specific_issues must be an empty array.\n"
@@ -23,9 +23,11 @@ VERIFIER_SYSTEM_PROMPT = (
 VERIFIER_USER_PROMPT = (
     "Documentation section:\n---\n{section_content}\n---\n\n"
     "Current code excerpt:\n---\n{code_context}\n---\n\n"
-    "Does any statement in the documentation contradict the code excerpt? Report only "
-    "concrete contradictions, not undocumented details. If the section is still true, "
-    "set is_stale to false with an empty specific_issues array."
+    "Pull request diff:\n---\n{diff}\n---\n\n"
+    "Does any statement in the documentation contradict the changed code in the diff? "
+    "Report only concrete contradictions caused by this diff, not undocumented details "
+    "or pre-existing gaps. If the section is still true, set is_stale to false with an "
+    "empty specific_issues array."
 )
 
 REWRITER_SYSTEM_PROMPT = (

@@ -236,7 +236,7 @@ def run_check(
             section_chunks.get(section.section_id, []), deleted_paths
         )
         staleness = verify_staleness(
-            section, code_context, openai_client, config.docsync_model
+            section, code_context, openai_client, config.docsync_model, diff_text
         )
 
         if not staleness.is_stale:

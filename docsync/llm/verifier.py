@@ -41,10 +41,12 @@ def verify_staleness(
     code_context: str,
     client: "OpenAI",
     model: str,
+    diff: str = "",
 ) -> StalenessResult:
     user_prompt = prompts.VERIFIER_USER_PROMPT.format(
         section_content=section.content,
         code_context=code_context,
+        diff=diff,
     )
     messages = [
         {"role": "system", "content": prompts.VERIFIER_SYSTEM_PROMPT},
