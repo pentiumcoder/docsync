@@ -1,0 +1,92 @@
+{
+  "docsync/cli.py::index": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/config.py::Config": [
+    "docs/usage.md##Using DocSync>Configuration"
+  ],
+  "docsync/config.py::load_config": [
+    "docs/usage.md##Using DocSync>Configuration"
+  ],
+  "docsync/detection/change_filter.py::filter_changes": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/detection/diff_parser.py::FileChange": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/detection/diff_parser.py::parse_diff": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/github_client/client.py::FileEdit": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/github_client/client.py::GitHubClient": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request",
+    "docs/usage.md##Using DocSync>Writing documentation DocSync can link"
+  ],
+  "docsync/github_client/client.py::GitHubClient.get_diff": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request"
+  ],
+  "docsync/github_client/client.py::GitHubClient.post_comment": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request"
+  ],
+  "docsync/github_client/client.py::GitHubClient.create_fix_pr": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request"
+  ],
+  "docsync/github_client/formatter.py::format_pr_comment": [
+    "docs/usage.md##Using DocSync>Writing documentation DocSync can link"
+  ],
+  "docsync/index/embedder.py::embed_texts": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/index/graph.py::build_graph": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/index/graph.py::save_graph": [
+    "docs/usage.md##Using DocSync>Committing the index"
+  ],
+  "docsync/index/graph.py::load_graph": [
+    "docs/usage.md##Using DocSync>Committing the index"
+  ],
+  "docsync/index/store.py::ChromaStore": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/llm/rewriter.py::CorrectionResult": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/llm/rewriter.py::rewrite_section": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request",
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/llm/verifier.py::StalenessResult": [
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/llm/verifier.py::verify_staleness": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request",
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/parsers/code_parser.py::CodeChunk": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/parsers/code_parser.py::parse_directory": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/parsers/docs_parser.py::DocSection": [
+    "docs/usage.md##Using DocSync>Building the index",
+    "docs/usage.md##Using DocSync>How automation decides"
+  ],
+  "docsync/parsers/docs_parser.py::parse_directory": [
+    "docs/usage.md##Using DocSync>Building the index"
+  ],
+  "docsync/pipeline.py::run_index": [
+    "docs/usage.md##Using DocSync>Building the index",
+    "docs/usage.md##Using DocSync>Troubleshooting",
+    "docs/usage.md##Using DocSync>Writing documentation DocSync can link"
+  ],
+  "docsync/pipeline.py::run_check": [
+    "docs/usage.md##Using DocSync>Adding the check to a pull request",
+    "docs/usage.md##Using DocSync>Committing the index",
+    "docs/usage.md##Using DocSync>How automation decides",
+    "docs/usage.md##Using DocSync>Writing documentation DocSync can link"
+  ]
+}
