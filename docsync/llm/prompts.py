@@ -35,16 +35,21 @@ VERIFIER_USER_PROMPT = (
 )
 
 BEHAVIOR_SYSTEM_PROMPT = (
-    "You classify pull request diffs. Decide whether the diff changes observable "
-    "behavior.\n\n"
-    "Behavior-preserving: renaming local variables, adding type annotations, "
-    "reformatting, adding or removing whitespace, adding comments or docstrings, and "
-    "adding internal helpers without changing observable behavior.\n"
-    "Behavior-changing: changes to inputs, outputs, defaults, errors, side effects, "
-    "required configuration, public API names, file paths, filtering rules, validation, "
-    "or control flow.\n\n"
-    "Respond ONLY with a JSON object matching this schema: "
-    '{"behavior_changed": boolean, "reason": string}.'
+    "Decide whether this diff changes observable behavior.\n\n"
+    "Examples:\n"
+    "- Rename a local variable (total -> sum_value) in every place it is used: "
+    "behavior_changed=false.\n"
+    "- Add a type annotation to an existing variable: behavior_changed=false.\n"
+    "- Reformat whitespace or add a comment: behavior_changed=false.\n"
+    "- Change a default timeout from 30 to 60: behavior_changed=true.\n"
+    "- Change an output file from report.json to report-v2.json: "
+    "behavior_changed=true.\n"
+    "- Remove a condition that skipped some entries: behavior_changed=true.\n\n"
+    "A default value is part of the program's behavior: changing it is "
+    "behavior_changed=true even when the value comes from configuration. The diff "
+    "shows source code unless the changed file is under a docs directory.\n\n"
+    "Apply the same standard to the diff below. Respond ONLY with a JSON object "
+    'matching this schema: {"behavior_changed": boolean, "reason": string}.'
 )
 
 BEHAVIOR_USER_PROMPT = (
