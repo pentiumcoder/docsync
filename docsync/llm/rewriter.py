@@ -57,6 +57,7 @@ def _call_json(
         ],
         response_format={"type": "json_object"},
         temperature=0,
+        seed=42,
     )
     return json.loads(response.choices[0].message.content)
 

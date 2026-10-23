@@ -64,6 +64,7 @@ def diff_changes_behavior(diff: str, client: "OpenAI", model: str) -> bool:
             ],
             response_format={"type": "json_object"},
             temperature=0,
+            seed=42,
         )
         payload = json.loads(response.choices[0].message.content)
         value = payload["behavior_changed"]
@@ -97,6 +98,7 @@ def verify_staleness(
             messages=messages,
             response_format={"type": "json_object"},
             temperature=0,
+            seed=42,
         )
         payload = json.loads(response.choices[0].message.content)
 

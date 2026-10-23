@@ -203,6 +203,7 @@ def test_verify_staleness_sends_expected_request():
     assert kwargs["model"] == MODEL
     assert kwargs["response_format"] == {"type": "json_object"}
     assert kwargs["temperature"] == 0
+    assert kwargs["seed"] == 42
     assert kwargs["messages"][0]["role"] == "system"
     assert kwargs["messages"][0]["content"] == prompts.VERIFIER_SYSTEM_PROMPT
     assert kwargs["messages"][1]["role"] == "user"
