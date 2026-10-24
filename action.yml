@@ -1,4 +1,4 @@
-name: DocSync
+name: DocSync for Github
 
 description: Detect stale documentation caused by Python code changes in a pull request.
 
